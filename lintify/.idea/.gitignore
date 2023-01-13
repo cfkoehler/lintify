@@ -1,6 +1,12 @@
 # Default ignored files
 /shelf/
 /workspace.xml
+target/
+# IDEs use a different build dir to reduce conflicts
+# when running maven on the commandline at the same time
+target-eclipse/
+target-netbeans/
+target-idea/
 
 # IDE stuff
 nbproject/
@@ -20,3 +26,9 @@ nbactions*.xml
 *.checkstyle
 .vscode/
 /logs/
+/compiler.xml
+/encodings.xml
+/sonarlint/issuestore/index.pb
+/jarRepositories.xml
+/misc.xml
+/vcs.xml
