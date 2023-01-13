@@ -1,0 +1,22 @@
+# Default ignored files
+/shelf/
+/workspace.xml
+
+# IDE stuff
+nbproject/
+manifest.mf
+nbbuild.xml
+nb-configuration.xml
+nbactions*.xml
+*.iml
+*.ipr
+*.iws
+.idea/
+.run/
+.project
+.classpath
+.settings/
+*.swp
+*.checkstyle
+.vscode/
+/logs/
