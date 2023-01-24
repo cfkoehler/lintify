@@ -1,11 +1,17 @@
 package me.connortech.lintify;
 
+import me.connortech.lintify.command.Banner;
+import org.junit.platform.commons.logging.Logger;
+import org.junit.platform.commons.logging.LoggerFactory;
 import picocli.CommandLine;
 
 import java.io.File;
 
-@CommandLine.Command(name = "Lintify", version = "BETA", mixinStandardHelpOptions = true)
-public class lintify implements Runnable {
+@CommandLine.Command(mixinStandardHelpOptions = true, version = "0.0.1-SNAPSHOT") //TODO: Substitute pom version here (Example: https://github.com/remkop/picocli/blob/main/picocli-examples/src/main/java/picocli/examples/VersionProviderDemo2.java)
+public class Lintify implements Runnable {
+    private static final Logger log = LoggerFactory.getLogger(Lintify.class);
+    private boolean bannerDumped = false;
+
 
     @CommandLine.Option(names = { "-r", "--rule-file" }, description = "Rule File")
     private File ruleFile;
@@ -17,6 +23,9 @@ public class lintify implements Runnable {
     private File inputFile;
     @Override
     public void run() {
+
+        // Dump Banner
+        dumpBanner();
 
         // Validate inputs
         validateInput();
@@ -37,9 +46,12 @@ public class lintify implements Runnable {
         }
     }
 
+    private void dumpBanner() {
+        new Banner().dump();
+    }
 
     public static void main(final String[] args) {
-        int exitCode = new CommandLine(new lintify()).execute(args);
+        int exitCode = new CommandLine(new Lintify()).execute(args);
         System.exit(exitCode);
     }
 }
