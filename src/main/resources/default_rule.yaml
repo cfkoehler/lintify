@@ -1,0 +1,11 @@
+LintifyParserVersion: 1
+RuleSetName: "Default Rule Set"
+Rules:
+  - Name: "rule1"
+    RuleType: LineStartRegex
+    RulePattern: "REGEX PATTERN"
+    WarnOnly: false
+  - Name: "rule2"
+    RuleType: LineEndRegex
+    RulePattern: "REGEX PATTERN"
+    WarnOnly: false

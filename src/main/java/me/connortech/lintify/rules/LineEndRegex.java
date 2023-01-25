@@ -1,5 +1,5 @@
 package me.connortech.lintify.rules;
 
-public class ruleParser {
+public class LineEndRegex extends Rule{
 
 }

@@ -3,6 +3,7 @@ package me.connortech.lintify;
 import me.connortech.lintify.command.Banner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.yaml.snakeyaml.Yaml;
 import picocli.CommandLine;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
@@ -10,12 +11,13 @@ import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.ConsoleAppender;
 
-import java.io.File;
+import java.io.*;
+import java.util.Map;
 
 @CommandLine.Command(mixinStandardHelpOptions = true, version = "0.0.1-SNAPSHOT") //TODO: Substitute pom version here (Example: https://github.com/remkop/picocli/blob/main/picocli-examples/src/main/java/picocli/examples/VersionProviderDemo2.java)
 public class Lintify implements Runnable {
     private static final Logger log = LoggerFactory.getLogger(Lintify.class);
-
+    private static final String DEFAULT_RULE_FILE = "default_rule.yaml";
 
     @CommandLine.Option(names = { "-r", "--rule-file" }, description = "Rule File")
     private File ruleFile;
@@ -33,12 +35,28 @@ public class Lintify implements Runnable {
 
         // Setup Logging
         setupLogbackForConsole();
-        log.info("Ready to start lintify!");
+        log.info("Lintify running on: {} with rule file: {}", inputFile, ruleFile);
 
         // Validate inputs
+
+        if (ruleFile == null) {
+            ruleFile = new File(DEFAULT_RULE_FILE);
+        }
+
         validateInput();
 
         // Read in rule file
+        // TODO: Extract this out into it's own class or function
+        Yaml ruleYaml = new Yaml();
+        Map<String, Object> ruleData;
+        try (InputStream inputStream = new FileInputStream(ruleFile);){
+            ruleData = ruleYaml.load(inputStream);
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        log.info(ruleData.toString());
 
         // Check input file against all rules
 
@@ -53,6 +71,13 @@ public class Lintify implements Runnable {
         } else if (!inputFile.isFile()) {
            // TODO: Do something because the input file is not a file
             log.error("Input file to validate is not a file");
+        }
+        if (!ruleFile.exists()) {
+            // TODO: Do something because the input file does not exist
+            log.error("Rule file does not exist");
+        } else if (!ruleFile.isFile()) {
+            // TODO: Do something because the input file is not a file
+            log.error("Rule file is not a file");
         }
     }
 
