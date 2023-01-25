@@ -1,7 +1,9 @@
 package me.connortech.lintify;
 
 import java.io.*;
+import java.net.URL;
 import java.util.Map;
+import java.util.Objects;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
@@ -20,14 +22,14 @@ public class Lintify implements Runnable {
     private static final Logger log = LoggerFactory.getLogger(Lintify.class);
     private static final String DEFAULT_RULE_FILE = "default_rule.yaml";
 
-    @CommandLine.Option(names = {"-r", "--rule-file"}, description = "Rule File")
-    private File ruleFile;
+    @CommandLine.Option(names = {"-r", "--rule-file"}, description = "Rule file that defines rules and parameters to use against the input file")
+    private String ruleFilePath;
 
     @CommandLine.Option(names = {"-w", "--warn-only"}, description = "Show only warnings and not fail validation")
     private boolean warnOnly = false;
 
     @CommandLine.Parameters(paramLabel = "<input file>", defaultValue = "", description = "Input file to validate against rules")
-    private File inputFile;
+    private String inputFilePath;
 
     @Override
     public void run() {
@@ -37,15 +39,19 @@ public class Lintify implements Runnable {
 
         // Setup Logging
         setupLogbackForConsole();
-        log.info("Lintify running on: {} with rule file: {}", inputFile, ruleFile);
+        log.info("Lintify running on: {} with rule file: {}", inputFilePath, ruleFilePath);
 
         // Validate inputs
-
-        if (ruleFile == null) {
-            ruleFile = new File(DEFAULT_RULE_FILE);
+        if (ruleFilePath == null) {
+            //TODO: The default rule file is not being found
+            URL ruleFileUrl = this.getClass().getClassLoader().getResource(DEFAULT_RULE_FILE);
+            log.debug("DEFAULT RULE FILE URL {}", ruleFileUrl);
+            ruleFilePath = Objects.requireNonNull(ruleFileUrl).toString();
         }
-
-        validateInput();
+        File ruleFile = new File(ruleFilePath);
+        File inputFile = new File(inputFilePath);
+        validateFileInput(ruleFile, "Rule File");
+        validateFileInput(inputFile, "Input File");
 
         // Read in rule file
         // TODO: Extract this out into it's own class or function
@@ -66,20 +72,13 @@ public class Lintify implements Runnable {
 
     }
 
-    private void validateInput() {
-        if (!inputFile.exists()) {
+    private void validateFileInput(File file, String fileType) {
+        if (!file.exists()) {
             // TODO: Do something because the input file does not exist
-            log.error("Input file to validate does not exist");
-        } else if (!inputFile.isFile()) {
+            log.error("{} to validate does not exist", fileType);
+        } else if (!file.isFile()) {
             // TODO: Do something because the input file is not a file
-            log.error("Input file to validate is not a file");
-        }
-        if (!ruleFile.exists()) {
-            // TODO: Do something because the input file does not exist
-            log.error("Rule file does not exist");
-        } else if (!ruleFile.isFile()) {
-            // TODO: Do something because the input file is not a file
-            log.error("Rule file is not a file");
+            log.error("{} to validate is not a file", fileType);
         }
     }
 
@@ -87,7 +86,7 @@ public class Lintify implements Runnable {
         new Banner().dump();
     }
 
-    public static LoggerContext setupLogbackForConsole() {
+    public static void setupLogbackForConsole() {
         // So it looks better when commands are run
         ch.qos.logback.classic.Logger root =
                 (ch.qos.logback.classic.Logger) org.slf4j.LoggerFactory.getLogger(ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME);
@@ -108,7 +107,6 @@ public class Lintify implements Runnable {
         root.addAppender(consoleAppender);
         root.setLevel(Level.INFO);
         root.setAdditive(false);
-        return lc;
     }
 
     public static void main(final String[] args) {
