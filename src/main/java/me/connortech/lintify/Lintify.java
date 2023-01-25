@@ -11,13 +11,13 @@ import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.ConsoleAppender;
 import me.connortech.lintify.command.Banner;
+import me.connortech.lintify.util.GitRepositoryState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.Yaml;
 import picocli.CommandLine;
 
-@CommandLine.Command(mixinStandardHelpOptions = true, version = "0.0.1-SNAPSHOT") // TODO: Substitute pom version here (Example:
-                                                                                  // https://github.com/remkop/picocli/blob/main/picocli-examples/src/main/java/picocli/examples/VersionProviderDemo2.java)
+@CommandLine.Command(mixinStandardHelpOptions = true, versionProvider = Lintify.ManifestVersionProvider.class)
 public class Lintify implements Runnable {
     private static final Logger log = LoggerFactory.getLogger(Lintify.class);
     private static final String DEFAULT_RULE_FILE = "default_rule.yaml";
@@ -43,7 +43,7 @@ public class Lintify implements Runnable {
 
         // Validate inputs
         if (ruleFilePath == null) {
-            //TODO: The default rule file is not being found
+            // TODO: The default rule file is not being found
             URL ruleFileUrl = this.getClass().getClassLoader().getResource(DEFAULT_RULE_FILE);
             log.debug("DEFAULT RULE FILE URL {}", ruleFileUrl);
             ruleFilePath = Objects.requireNonNull(ruleFileUrl).toString();
@@ -113,4 +113,12 @@ public class Lintify implements Runnable {
         int exitCode = new CommandLine(new Lintify()).execute(args);
         System.exit(exitCode);
     }
+
+    static class ManifestVersionProvider implements CommandLine.IVersionProvider {
+        public String[] getVersion() throws Exception {
+            GitRepositoryState version = GitRepositoryState.getRepositoryState();
+            return new String[] {"Lintify version " + version.getBuildVersion()};
+        }
+    }
+
 }
