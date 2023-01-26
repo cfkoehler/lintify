@@ -1,0 +1,51 @@
+name: Java CI with Maven
+
+on:
+  push:
+    branches: [ main, release-* ]
+  pull_request:
+    branches: [ main, release-* ]
+
+jobs:
+  build:
+
+    name: Standard build on Java ${{ matrix.java }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        java: ['11']
+        experimental: [false]
+        include:
+          - java: '15'
+            experimental: true
+          - java: '16'
+            experimental: true
+          - java: '17'
+            experimental: true
+    continue-on-error: ${{ matrix.experimental }}
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v3
+
+    - name: Configure Java & Maven
+      uses: actions/setup-java@v3
+      with:
+        java-version: '${{ matrix.java }}'
+        cache: 'maven'
+        distribution: 'corretto'
+
+    - name: Build with Maven
+      run: mvn -B --no-transfer-progress verify --file pom.xml
+
+    - name: Verify Changed Files
+      uses: tj-actions/verify-changed-files@v12
+      id: verify-changed-files
+
+    - name: Run step only when files change
+      if: steps.verify-changed-files.outputs.files_changed == 'true'
+      uses: actions/github-script@v6.3.3
+      with:
+        script: |
+          core.setFailed('Changed files found: ${{ steps.verify-changed-files.outputs.changed_files }}')

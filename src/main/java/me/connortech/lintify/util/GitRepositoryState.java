@@ -61,7 +61,7 @@ public class GitRepositoryState {
     }
 
     public static GitRepositoryState getRepositoryState() {
-        return getRepositoryState("linitfy.git.properties"); //TODO: This is not being found in the java class path
+        return getRepositoryState("linitfy.git.properties"); // TODO: This is not being found in the java class path
     }
 
     public static GitRepositoryState getRepositoryState(String gitProperties) {
