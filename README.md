@@ -1,4 +1,6 @@
 [![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?style=for-the-badge&logo=gitpod&logoColor=white)](https://gitpod.io/#https://github.com/cfkoehler/lintify)
+[![CodeQL](https://github.com/cfkoehler/lintify/actions/workflows/codeql.yml/badge.svg?branch=main)](https://github.com/cfkoehler/lintify/actions/workflows/codeql.yml)
+[![Java CI with Maven](https://github.com/cfkoehler/lintify/actions/workflows/maven.yml/badge.svg?branch=main)](https://github.com/cfkoehler/lintify/actions/workflows/maven.yml)
 # lintify
 Java Framework for flat text file linting
 
